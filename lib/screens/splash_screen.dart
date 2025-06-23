@@ -13,10 +13,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 2), () {
+    Timer(const Duration(seconds: 10), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const kenHomeScreen()),
       );
     });
   }
@@ -29,16 +29,19 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image(image: AssetImage('assets/logo.png'), width: 150),
+            Image(
+              image: AssetImage('assets/logo.png'), // pastikan logo ini ada
+              width: 150,
+            ),
             SizedBox(height: 20),
             Text(
-              'Splash Screen',
+              'splashscreen...',
               style: TextStyle(
+                fontSize: 16,
                 color: Colors.purple,
-                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
-            )
+            ),
           ],
         ),
       ),

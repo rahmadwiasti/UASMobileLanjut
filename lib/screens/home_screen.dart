@@ -2,26 +2,28 @@ import 'package:flutter/material.dart';
 import '../db/database_helper.dart';
 import '../model/endemik.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class kenHomeScreen extends StatefulWidget {
+  const kenHomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<kenHomeScreen> createState() => _kenHomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  List<Endemik> _endemikList = [];
+class _kenHomeScreenState extends State<kenHomeScreen> {
+  List<Endemik> _listBurung = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadEndemik();
+    _loadBurung();
   }
 
-  Future<void> _loadEndemik() async {
+  Future<void> _loadBurung() async {
     final data = await DatabaseHelper().getAll();
     setState(() {
-      _endemikList = data;
+      _listBurung = data;
+      _isLoading = false;
     });
   }
 
@@ -29,45 +31,54 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('EndemikDB', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('EndemikDB'),
+        backgroundColor: Colors.purple,
         centerTitle: true,
       ),
-      body: _endemikList.isEmpty
+      body: _isLoading
           ? const Center(child: CircularProgressIndicator())
+          : _listBurung.isEmpty
+          ? const Center(child: Text('Belum ada data burung.'))
           : GridView.builder(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(10),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 3 / 3.2,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
+          crossAxisCount: 2, // 2 kolom
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: 0.8,
         ),
-        itemCount: _endemikList.length,
+        itemCount: _listBurung.length,
         itemBuilder: (context, index) {
-          final item = _endemikList[index];
+          final burung = _listBurung[index];
           return Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            elevation: 4,
             child: Column(
               children: [
                 Expanded(
                   child: ClipRRect(
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-                    child: Image.network(
-                      item.foto,
-                      width: double.infinity,
+                    child: Image.asset(
+                      burung.foto,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+                      width: double.infinity,
+                      errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.broken_image, size: 50),
                     ),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(6.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    item.nama,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                    maxLines: 2,
+                    burung.nama,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -75,6 +86,22 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0,
+        onTap: (index) {
+          // Nanti bisa tambahkan navigasi ke halaman favorit
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Beranda',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Favorit',
+          ),
+        ],
       ),
     );
   }

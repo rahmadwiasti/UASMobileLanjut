@@ -14,7 +14,6 @@ dependencies:
   path_provider: ^2.1.2
   path: any
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -25,3 +24,12 @@ flutter:
 
   assets:
     - assets/logo.png
+    - assets/images/cendrawasih.png
+    - assets/images/jalak_bali.png
+    - assets/images/walik_solomon.jpg
+    - assets/images/rangkong_papan.jpg
+    - assets/images/taktarau_iblis.jpg
+    - assets/images/Delimukan_Sulawesi.jpg
+    - assets/images/anis_buru.jpg
+    - assets/images/anis_geomalia.jpg
+    - assets/images/sri_lanka.jpg
