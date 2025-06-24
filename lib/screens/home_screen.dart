@@ -1,106 +1,91 @@
 import 'package:flutter/material.dart';
-import '../db/database_helper.dart';
 import '../model/endemik.dart';
+import '../db/database_helper.dart';
+import 'favorite_screen.dart';
+import 'detail_screen.dart';
 
-class kenHomeScreen extends StatefulWidget {
-  const kenHomeScreen({Key? key}) : super(key: key);
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<kenHomeScreen> createState() => _kenHomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _kenHomeScreenState extends State<kenHomeScreen> {
-  List<Endemik> _listBurung = [];
-  bool _isLoading = true;
+class _HomeScreenState extends State<HomeScreen> {
+  late Future<List<Endemik>> futureEndemik;
 
   @override
   void initState() {
     super.initState();
-    _loadBurung();
-  }
-
-  Future<void> _loadBurung() async {
-    final data = await DatabaseHelper().getAll();
-    setState(() {
-      _listBurung = data;
-      _isLoading = false;
-    });
+    futureEndemik = DatabaseHelper().getAll();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('EndemikDB'),
-        backgroundColor: Colors.purple,
-        centerTitle: true,
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _listBurung.isEmpty
-          ? const Center(child: Text('Belum ada data burung.'))
-          : GridView.builder(
-        padding: const EdgeInsets.all(10),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, // 2 kolom
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio: 0.8,
-        ),
-        itemCount: _listBurung.length,
-        itemBuilder: (context, index) {
-          final burung = _listBurung[index];
-          return Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            elevation: 4,
-            child: Column(
-              children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-                    child: Image.asset(
-                      burung.foto,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.broken_image, size: 50),
+      appBar: AppBar(title: const Text("EndemikDB")),
+      body: FutureBuilder<List<Endemik>>(
+        future: futureEndemik,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return const Center(child: Text("Terjadi kesalahan"));
+          } else {
+            final data = snapshot.data!;
+            return GridView.builder(
+              padding: const EdgeInsets.all(8),
+              itemCount: data.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.9,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+              ),
+              itemBuilder: (context, index) {
+                final item = data[index];
+                return GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => DetailScreen(data: item),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    burung.nama,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                  child: Card(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Image.network(
+                            item.foto,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Text(
+                          item.nama,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                ),
-              ],
-            ),
-          );
+                );
+              },
+            );
+          }
         },
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
         onTap: (index) {
-          // Nanti bisa tambahkan navigasi ke halaman favorit
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const FavoriteScreen()),
+            );
+          }
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Beranda',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorit',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Beranda"),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: "Favorit"),
         ],
       ),
     );

@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
-import 'screens/splash_screen.dart'; // Pastikan path ini sesuai
+import 'screens/home_screen.dart';
+import 'screens/splash_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const EndemikDBApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class EndemikDBApp extends StatelessWidget {
+  const EndemikDBApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'EndemikDB',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-        useMaterial3: false,
-      ),
+      theme: ThemeData(primarySwatch: Colors.green),
       home: const SplashScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
